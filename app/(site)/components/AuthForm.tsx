@@ -53,6 +53,7 @@ const AuthForm = () => {
         }
 
         if (variant === 'LOGIN') {
+        //https://next-auth.js.org/getting-started/client#signin
             signIn('credentials', {
               ...data,
               redirect: false
@@ -71,8 +72,22 @@ const AuthForm = () => {
 
     const socialAction = (action: string) => {
         setIsLoading(true);
+        signIn(action)
+        //when you chain then() to a Promise,the resolved value of the Promise is 
+        //automatically passed as an arg to the callback function defined within the then() method.
 
-        //nextauth social signin
+        //(callback)=>:this code defines the callback function and passes it into .then() as args 
+        //you can also define callback function separetely
+        .then((callback)=>{
+            if (callback?.error){
+                toast.error('Invalid Credentials')
+            }
+            if (callback?.ok && !callback?.error){
+                toast.success('Logged In')
+            } 
+        })
+        .finally(()=>setIsLoading(false))
+    
     }
 
     return (
@@ -89,7 +104,6 @@ const AuthForm = () => {
                     {variant === "REGISTER" && (
                         <Input label="name" id="name"
                             register={register} errors={errors} disabled={isLoading} />
-
                     )}
                     <Input label="Email address" type="email" id="email"
                         register={register} errors={errors} disabled={isLoading}/>
@@ -124,7 +138,7 @@ const AuthForm = () => {
 
                     <div className="mt-6 flex gap-2">
                         <AuthSocialButton icon={BsGithub} onClick={()=>socialAction('github')}/>
-                        <AuthSocialButton icon={BsGoogle} onClick={()=>socialAction('github')}/>
+                        <AuthSocialButton icon={BsGoogle} onClick={()=>socialAction('google')}/>
                     </div>
                 </div>
 
