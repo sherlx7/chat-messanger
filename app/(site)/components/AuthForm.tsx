@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 //@ts-ignore
 import Input from "@/app/components/inputs/Input";
@@ -9,13 +9,23 @@ import AuthSocialButton from "./AuthSocialButton";
 import {BsGithub, BsGoogle} from "react-icons/bs";
 import axios from "axios";
 import {toast} from "react-hot-toast";
-import {signIn} from "next-auth/react";
+import {signIn,useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 
 type Variant = 'LOGIN' | 'REGISTER';
 
 const AuthForm = () => {
+    //useSession hook:part of NextAuth,returns an object containing 'data' and 'status'
+    const session = useSession();
+    const router=useRouter();
     const [variant, setVariant] = useState<Variant>('LOGIN');
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(()=>{
+        if (session?.status === "authenticated"){
+            router.push('/users')
+        }
+    },[session?.status,router])
 
     //single function that encapsulates the logic of toggling the variant state
     //use Callback:memoizes functions in fc, returns a memoized version of the function 
@@ -48,6 +58,7 @@ const AuthForm = () => {
 
         if (variant === 'REGISTER') {
             axios.post('/api/register',data)
+            .then(()=>signIn('credentials',data))
             .catch(()=>toast.error('Something went wrong'))
             .finally(()=>setIsLoading(false))
         }
@@ -63,7 +74,8 @@ const AuthForm = () => {
                 toast.error('Invalid credentials!');
               }
               if (callback?.ok && !callback?.error){
-                toast.success('Logged in')
+                toast.success('Logged in');
+                router.push('/users');
               }
             })
             .finally(()=>setIsLoading(false));
