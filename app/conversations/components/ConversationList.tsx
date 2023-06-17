@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from "clsx";
+import { User } from "@prisma/client";
 import useConversation from "@/app/hooks/useConversation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +11,8 @@ import ConversationBox from "./ConversationBox";
 
 interface ConversationListProps{
     initialItems:FullConversationType[];
+    users: User[];
+    title?: string;
 }
 
 const ConversationList:React.FC<ConversationListProps>=({

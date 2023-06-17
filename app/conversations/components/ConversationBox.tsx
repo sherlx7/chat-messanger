@@ -24,9 +24,12 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
     const otherUser = useOtherUser(data);
     const session = useSession();
     const router = useRouter();
+
+    //need backtick to actually pass in the value of data.id
+    //if not,will pass in literal string
     const handleClick = useCallback(() => {
-        router.push('/conversations/${data.id}')
-    }, [data.id]);
+        router.push(`/conversations/${data.id}`);
+      }, [data, router]);
 
     const lastMessage = useMemo(() => {
         const messages = data.messages || [];
